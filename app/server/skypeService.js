@@ -108,16 +108,16 @@ var SkypeService = {
                         PatternsService.playPatternFrom( rule.name, rule.patternId, rule.blink1Id );
                     }
                 }
-				if( rule.triggerType === 'any' ) {
-					if( message.resource.messagetype === 'RichText/Media_GenericFile' ||
-					    message.resource.messagetype === 'RichText/Media_Video' ||
-					    message.resource.messagetype === 'RichText/UriObject' ||
-						message.resource.messagetype === 'RichText/Contacts' ) {
-							log.msg("SkypeService: INCOMING MESSAGE FROM",cname);
-							log.addEvent( {type:'trigger', source:'skype', id:rule.name, text:'message: '+cname});
-							PatternsService.playPatternFrom( rule.name, rule.patternId, rule.blink1Id );
-						}
-				}
+                if( rule.triggerType === 'any' ) {
+                    if( message.resource.messagetype === 'RichText/Media_GenericFile' ||
+                        message.resource.messagetype === 'RichText/Media_Video' ||
+                        message.resource.messagetype === 'RichText/UriObject' ||
+                        message.resource.messagetype === 'RichText/Contacts' ) {
+                            log.msg("SkypeService: INCOMING MESSAGE FROM",cname);
+                            log.addEvent( {type:'trigger', source:'skype', id:rule.name, text:'message: '+cname});
+                            PatternsService.playPatternFrom( rule.name, rule.patternId, rule.blink1Id );
+                    }
+                }
                 // also: message.resource.messagetype == 'Text'
                 // also: message.resource.messagetype == 'Event/Call'
                 // if (message.resource.from.indexOf(username) === -1 &&
