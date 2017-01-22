@@ -116,7 +116,7 @@ var _makePattern = function(template) {
 };
 
 var _generatePatternStr = function(pattern) {
-    if (!pattern || !pattern.repeats || !pattern.colors) {
+    if (!pattern || pattern.repeats < 0 || pattern.repeats > 9 || !pattern.colors) {
         return '';
     }
     var pattstr = pattern.repeats;
