@@ -377,7 +377,10 @@ var PatternsService = {
         // first, is the pattern actually a hex color?
         if (pattid.startsWith('#')) { // color
             // count + ',' + c.toHexString() + ','+secs+
-            Blink1Service.fadeToColor(100, pattid, 0, blink1id); // 0 == all LEDs
+            var color = pattid.substr(0,7);
+            var led = ( pattid.indexOf("@") != 7 ) ? 0 : parseInt( pattid.substr(8,1));
+            log.msg("PatternsService.playPattern: color:", color, "led:", led);
+            Blink1Service.fadeToColor(100, color, led, blink1id);
             return pattid;
         }
         // then, look for special meta-pattern

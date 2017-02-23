@@ -136,8 +136,8 @@ var ScriptService = {
 
     },
 
-    playPattern: function(pattid,ruleid) {
-        if( PatternsService.playPatternFrom( ruleid, pattid ) ) {
+    playPattern: function(pattid,ruleid,blinkid) {
+        if( PatternsService.playPatternFrom( ruleid, pattid, blinkid ) ) {
             this.lastPatterns[ruleid] = pattid;
             return pattid;
         }
@@ -167,7 +167,9 @@ var ScriptService = {
         var self = this;
         var patternre = /pattern:\s*(#*\w+)/;
         var colorre = /(#[0-9a-f]{6}|#[0-9a-f]{3}|color:\s*(.+?)\s)/i;
+        var ledre = /(@[0-2])/;
         var matches;
+        var led;
 
         if( self.lastEvents[rule.name] === str && rule.actOnNew ) {
             log.addEvent( {type:'info', source:rule.type, id:rule.name, text:'not modified'});
@@ -193,8 +195,13 @@ var ScriptService = {
                 else if( json.color ) {
                     var c = tinycolor(json.color);
                     if( c.isValid() ) {
-                        log.addEvent( {type:'trigger', source:rule.type, id:rule.name, text:json.color});
-                        this.playPattern( c.toHexString(), rule.name, rule.blink1id );
+                        led = ( json.led === undefined ) ? 0 : json.led;
+                        if( led >= 0 && led <= 2 ) {
+                            log.addEvent( {type:'trigger', source:rule.type, id:rule.name, text:json.color+', '+led});
+                            this.playPattern( c.toHexString()+'@'+led, rule.name, rule.blink1id );
+                        } else {
+                            log.addEvent( {type:'error', source:rule.type, id:rule.name, text:'invalid led '+json.led});
+                        }
                     } else {
                         log.addEvent( {type:'error', source:rule.type, id:rule.name, text:'invalid color '+json.color});
                     }
@@ -207,7 +214,7 @@ var ScriptService = {
             matches = patternre.exec( str );
             if( matches ) {
                 var patt_name = matches[1];
-                if( this.playPattern( patt_name, rule.name  ) ) {
+                if( this.playPattern( patt_name, rule.name, rule.blink1id ) ) {
                     log.addEvent( {type:'trigger', source:rule.type, id:rule.name, text:str});
                 }
                 log.addEvent( {type:'error', source:rule.type, id:rule.name, text:'no pattern '+str});
@@ -223,8 +230,11 @@ var ScriptService = {
                 var colormatch = matches[1];
                 var color = tinycolor( colormatch );
                 if( color.isValid() ) {
-                    log.addEvent( {type:'trigger', source:rule.type, id:rule.name, text:colormatch});
-                    this.playPattern( color.toHexString(), rule.name );
+                    matches = ledre.exec(str);
+                    log.msg("matches:",matches);
+                    led = matches ? matches[1].substr(1,1) : 0;
+                    log.addEvent( {type:'trigger', source:rule.type, id:rule.name, text:colormatch+led});
+                    this.playPattern( color.toHexString()+'@'+led, rule.name, rule.blink1id );
                 }
                 else {
                     log.addEvent( {type:'error', source:rule.type, id:rule.name, text:'invalid color '+colormatch});
